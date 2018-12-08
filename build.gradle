@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.3.12'
+}
+
+group 'com.newtoncodes'
+version = "0.1.0"
+
+allprojects {
+    apply plugin: 'application'
+    apply plugin: 'java'
+    sourceSets {
+        main {
+            java.srcDirs = ['src']
+            resources.srcDirs = ['resources']
+        }
+        test {
+            java.srcDirs = ['tests']
+        }
+    }
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+intellij {
+    version '2018.3'
+}
+
+patchPluginXml {
+    changeNotes """"""
+}
