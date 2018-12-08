@@ -1,0 +1,58 @@
+<idea-plugin>
+    <id>com.newtoncodes.spellchecker</id>
+    <name>Dictionary sync</name>
+    <version>0.1.0</version>
+
+    <vendor email="dev@newton.codes" url="https://github.com/newtoncodes">Christian Nikolov</vendor>
+    <description><![CDATA[
+        1. Add a project based dictionary file to be used before user dictionaries.
+        2. Allow application dictionary to be synced with other settings across computers.
+        3. Bundled hunspell dictionaries.
+    ]]></description>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceInterface="com.newtoncodes.spellchecker.states.GlobalSettingsState"
+                serviceImplementation="com.newtoncodes.spellchecker.states.GlobalSettingsState"
+        />
+        <projectService
+                serviceInterface="com.newtoncodes.spellchecker.states.ProjectSettingsState"
+                serviceImplementation="com.newtoncodes.spellchecker.states.ProjectSettingsState"
+        />
+        <projectConfigurable groupId="editor"
+            id="reference.settings.ide.settings.spelling.extended"
+            key="spelling.extended"
+            bundle="com.newtoncodes.spellchecker.settings.Bundle"
+            instance="com.newtoncodes.spellchecker.settings.Manager"
+        />
+
+        <projectService overrides="true"
+            serviceInterface="com.intellij.spellchecker.SpellCheckerManager"
+            serviceImplementation="com.newtoncodes.spellchecker.Manager"
+        />
+
+        <projectService
+            serviceInterface="com.newtoncodes.spellchecker.states.ProjectSharedState"
+            serviceImplementation="com.newtoncodes.spellchecker.states.ProjectSharedState"
+        />
+        <projectService overrides="true"
+            serviceInterface="com.intellij.spellchecker.state.ProjectDictionaryState"
+            serviceImplementation="com.newtoncodes.spellchecker.states.ProjectUserState"
+        />
+
+        <applicationService
+            serviceInterface="com.newtoncodes.spellchecker.states.GlobalSharedState"
+            serviceImplementation="com.newtoncodes.spellchecker.states.GlobalSharedState"
+        />
+        <applicationService overrides="true"
+            serviceInterface="com.intellij.spellchecker.state.CachedDictionaryState"
+            serviceImplementation="com.newtoncodes.spellchecker.states.GlobalUserState"
+        />
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.spellchecker">
+        <bundledDictionaryProvider order="last" implementation="com.newtoncodes.spellchecker.Provider" />
+    </extensions>
+</idea-plugin>
