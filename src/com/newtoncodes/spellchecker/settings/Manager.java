@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 
+@SuppressWarnings("CanBeFinal")
 public class Manager implements SearchableConfigurable, Configurable.NoScroll {
     private Pane pane;
     private ProjectSettingsState settingsProject;

@@ -1,25 +1,23 @@
 package com.newtoncodes.spellchecker;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.spellchecker.BundledDictionaryProvider;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
 
 public class Provider implements BundledDictionaryProvider {
-    private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Provider");
+    // private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Provider");
 
     @Override
     public String[] getBundledDictionaries() {
         return new String[] {};
     }
 
+    @SuppressWarnings("RedundantThrows")
     public static List<String> getDictionaries() throws IOException {
         List<String> filenames = new ArrayList<>();
 
@@ -44,7 +42,7 @@ public class Provider implements BundledDictionaryProvider {
     }
 
     private static Collection<String> getResources(final String element, final Pattern pattern) {
-        final ArrayList<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         final File file = new File(element);
 
         if(file.isDirectory()){
@@ -56,9 +54,10 @@ public class Provider implements BundledDictionaryProvider {
 
     private static Collection<String> getResourcesFromDirectory(final File directory, final Pattern pattern) {
         final ArrayList<String> result = new ArrayList<>();
-        final File[] fileList = directory.listFiles();
+        final File[] files = directory.listFiles();
+        if (files == null) return result;
 
-        for (final File file : fileList) {
+        for (final File file : files) {
             if(file.isDirectory()){
                 result.addAll(getResourcesFromDirectory(file, pattern));
             } else{

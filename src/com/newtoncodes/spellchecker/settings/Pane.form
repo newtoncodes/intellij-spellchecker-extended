@@ -30,6 +30,7 @@
                 </constraints>
                 <properties>
                   <name value=""/>
+                  <selected value="false"/>
                   <text resource-bundle="com/newtoncodes/spellchecker/settings/Bundle" key="checkbox.shared.global"/>
                 </properties>
               </component>

@@ -1,39 +1,84 @@
 plugins {
-    id 'java'
+    id 'com.gradle.plugin-publish' version '0.10.0'
     id 'org.jetbrains.intellij' version '0.3.12'
+    id 'idea'
+    id 'maven'
 }
 
-group 'com.newtoncodes'
-version = "0.1.0"
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'java-gradle-plugin'
 
-allprojects {
-    apply plugin: 'application'
-    apply plugin: 'java'
-    sourceSets {
-        main {
-            java.srcDirs = ['src']
-            resources.srcDirs = ['resources']
-        }
-        test {
-            java.srcDirs = ['tests']
+repositories {
+    mavenCentral()
+    maven { url 'https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-plugin-service' }
+    maven { url 'https://cache-redirector.jetbrains.com/repo1.maven.org/maven2' }
+    maven { url 'https://cache-redirector.jetbrains.com/jcenter.bintray.com' }
+    maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+
+    compile 'org.jetbrains:annotations:13.0'
+    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.30'
+    compile 'org.jetbrains.intellij.plugins:structure-base:3.45'
+    compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
+    compile 'de.undercouch:gradle-download-task:3.4.2'
+
+    implementation fileTree(dir: 'lib', include: '*.jar')
+//    ideaPlugins fileTree(dir: 'lib', include: '*.jar')
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src']
+        resources.srcDirs = ['resources']
+    }
+
+    test {
+        java.srcDirs = ['tests']
+    }
+}
+
+intellij {
+    sandboxDirectory = "$project.buildDir/sandbox"
+    version '2018.3.1'
+}
+
+//
+
+version = "$version"
+group = "$group"
+description = "$description"
+
+pluginBundle {
+    website = 'https://github.com/newtoncodes/intellij-spellchecker-extended'
+    vcsUrl = 'https://github.com/newtoncodes/intellij-spellchecker-extended'
+    description = "$description"
+    tags = ['spellchecker', 'dictionaries', 'dictionary', 'sync', 'share']
+
+    //noinspection GroovyAssignabilityCheck
+    plugins {
+        intellijPlugin {
+            id = id
+            displayName = name
         }
     }
 }
 
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
+publishPlugin {
+    username intellijPublishUsername
+    password intellijPublishPassword
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}
+//
 
-intellij {
-    version '2018.3'
-}
-
-patchPluginXml {
-    changeNotes """"""
+wrapper {
+    gradleVersion = '4.10'
+    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
