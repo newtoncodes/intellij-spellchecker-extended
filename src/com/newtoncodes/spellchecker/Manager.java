@@ -47,6 +47,7 @@ public class Manager extends SpellCheckerManager {
     private Set<String> hunspell;
     private String version;
 
+    @SuppressWarnings("WeakerAccess")
     public Manager(Project project, SpellCheckerSettings settings) {
         super(project, settings);
     }
