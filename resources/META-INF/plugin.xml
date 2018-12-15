@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.newtoncodes.spellchecker</id>
-    <name>Dictionary sync</name>
+    <name>Spell checker extended</name>
     <version>0.1.0</version>
 
     <vendor email="dev@newton.codes" url="https://github.com/newtoncodes">Christian Nikolov</vendor>
@@ -51,9 +51,5 @@
             serviceInterface="com.intellij.spellchecker.state.CachedDictionaryState"
             serviceImplementation="com.newtoncodes.spellchecker.states.GlobalUserState"
         />
-    </extensions>
-
-    <extensions defaultExtensionNs="com.intellij.spellchecker">
-        <bundledDictionaryProvider order="last" implementation="com.newtoncodes.spellchecker.Provider" />
     </extensions>
 </idea-plugin>

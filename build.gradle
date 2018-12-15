@@ -28,7 +28,7 @@ dependencies {
     compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
     compile 'de.undercouch:gradle-download-task:3.4.2'
 
-    implementation fileTree(dir: 'lib', include: '*.jar')
+//    implementation fileTree(dir: 'lib', include: '*.jar')
 //    ideaPlugins fileTree(dir: 'lib', include: '*.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -46,8 +46,9 @@ sourceSets {
 }
 
 intellij {
-    sandboxDirectory = "$project.buildDir/sandbox"
+    sandboxDirectory = "$project.buildDir/ide-sandbox"
     version '2018.3.1'
+    plugins 'hunspell:183.3795.24'
 }
 
 //

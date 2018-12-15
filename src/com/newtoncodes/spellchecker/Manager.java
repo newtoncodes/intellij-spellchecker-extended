@@ -1,11 +1,14 @@
 package com.newtoncodes.spellchecker;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.*;
-import com.intellij.spellchecker.FileLoader;
 import com.intellij.spellchecker.SpellCheckerManager;
 import com.intellij.spellchecker.dictionary.CustomDictionaryProvider;
 import com.intellij.spellchecker.dictionary.Dictionary;
@@ -21,20 +24,19 @@ import com.newtoncodes.spellchecker.states.ProjectUserState;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.net.URL;
-import java.util.*;
+import java.io.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static com.intellij.openapi.application.PathManager.getOptionsPath;
 import static com.intellij.project.ProjectKt.getProjectStoreDirectory;
 
 
-@SuppressWarnings("WeakerAccess")
 public class Manager extends SpellCheckerManager {
-    private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Manager");
+    private static final String CACHE_PATH = System.getProperty("idea.system.path", "") + File.separator + "spellchecker-extended";
 
-    public static final String SHARED_CACHED_DICTIONARY_FILE  = "sharedDictionary.xml";
-    public static final String SHARED_PROJECT_DICTIONARY_PATH = "dictionary.xml";
+    private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Manager");
 
     private ProjectUserState projectState;
     private GlobalUserState globalState;
@@ -43,6 +45,7 @@ public class Manager extends SpellCheckerManager {
     private GlobalSettingsState globalSettings;
 
     private Set<String> hunspell;
+    private String version;
 
     public Manager(Project project, SpellCheckerSettings settings) {
         super(project, settings);
@@ -68,14 +71,12 @@ public class Manager extends SpellCheckerManager {
 
         for (String name : removed) {
             changed = true;
-            hunspell.remove(name);
-            getSpellChecker().removeDictionary(name);
+            unloadHunspell(name);
         }
 
         for (String name : enabled) {
             if (!hunspell.contains(name)) {
                 changed = true;
-                hunspell.add(name);
                 loadHunspell(name);
             }
         }
@@ -86,6 +87,11 @@ public class Manager extends SpellCheckerManager {
     @Override
     public void fullConfigurationReload() {
         super.fullConfigurationReload();
+
+        if (version == null) {
+            IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId("com.newtoncodes.spellchecker"));
+            version = plugin != null ? plugin.getVersion() : "0.0.0";
+        }
 
         if (hunspell == null) hunspell = new THashSet<>();
 
@@ -104,43 +110,18 @@ public class Manager extends SpellCheckerManager {
         }
 
         final Set<String> enabled = projectSettings.getHunspell();
-        // TODO: loader class from provider
 
         hunspell.clear();
 
         if (enabled != null && !enabled.isEmpty()) for (String name : enabled) {
-            hunspell.add(name);
             loadHunspell(name);
         }
     }
 
-    private void loadHunspell(@NotNull String name) {
-        final URL stream = Manager.class.getResource(name);
-        if (stream == null) {
-            LOG.info("Hunspell not found: " + name);
-            return;
-        }
-
-        final String path = stream.getFile();
-        for (CustomDictionaryProvider provider : CustomDictionaryProvider.EP_NAME.getExtensionList()) {
-            LOG.info("HUNSPELL PROVIDER0 " + provider.toString());
-
-            final Dictionary dictionary = provider.get(name);
-            if (dictionary == null) continue;
-
-            LOG.info("HUNSPELL PROVIDER2 " + provider.toString());
-
-            getSpellChecker().addDictionary(dictionary);
-            return;
-        }
-
-        LOG.info("HUNSPELL NO PROVIDER " + path);
-        getSpellChecker().loadDictionary(new FileLoader(path));
-    }
-
     @Override
     public boolean hasProblem(@NotNull String word) {
-        // TODO: skip hex and shit
+        if (word.matches("^[a-fA-F0-9]+$")) return false;
+        LOG.warn("[HUNSPELL] WORD: " + word);
         return super.hasProblem(word);
     }
 
@@ -159,7 +140,7 @@ public class Manager extends SpellCheckerManager {
         if (ProjectUserState.DICTIONARY_SHARED.equals(dictionary.getActive())) {
             final VirtualFile base = ProjectUtil.guessProjectDir(getProject());
             final VirtualFile store = base != null ? getProjectStoreDirectory(base) : null;
-            return store != null ? store.getPath() + File.separator + SHARED_PROJECT_DICTIONARY_PATH : "";
+            return store != null ? store.getPath() + File.separator + "dictionary.xml" : "";
         }
 
         return super.getProjectDictionaryPath();
@@ -171,9 +152,121 @@ public class Manager extends SpellCheckerManager {
         final ExtendedDictionary dictionary = (ExtendedDictionary) globalState.getDictionary();
 
         if (GlobalUserState.DICTIONARY_SHARED.equals(dictionary.getActive())) {
-            return getOptionsPath() + File.separator + SHARED_CACHED_DICTIONARY_FILE;
+            return getOptionsPath() + File.separator + "sharedDictionary.xml";
         }
 
         return super.getAppDictionaryPath();
+    }
+
+    private void loadHunspell(@NotNull String name) {
+        hunspell.add(name);
+
+        final String dic = preloadResource(name);
+        if (dic == null) {
+            LOG.warn("[HUNSPELL] Dic file not found: " + name);
+            return;
+        }
+
+        final String aff = preloadResource(FileUtilRt.getNameWithoutExtension(name) + "." + "aff");
+        if (aff == null) {
+            LOG.warn("[HUNSPELL] Aff file not found: " + name);
+            return;
+        }
+
+        for (CustomDictionaryProvider provider : CustomDictionaryProvider.EP_NAME.getExtensionList()) {
+            if (!provider.toString().startsWith("com.intellij.hunspell.HunspellDictionaryProvider")) continue;
+
+            final Dictionary dictionary = provider.get(dic);
+            if (dictionary == null) continue;
+
+            getSpellChecker().addDictionary(dictionary);
+            return;
+        }
+    }
+
+    private void unloadHunspell(@NotNull String name) {
+        hunspell.remove(name);
+        getSpellChecker().removeDictionary(getResourceFile(name).getPath());
+    }
+
+    private File getResourceFile(@NotNull String name) {
+        return new File(CACHE_PATH + File.separator + version + File.separator + name);
+    }
+
+    private void purgeResourceFiles(@NotNull File dir, int level) {
+        if (!dir.exists() || !dir.isDirectory()) return;
+
+        File[] list = dir.listFiles();
+        if (list == null) return;
+
+        for (File f: list) {
+            if (level == 0 && f.getName().equals(version)) continue;
+            if (f.isDirectory()) purgeResourceFiles(f, 1);
+            //noinspection ResultOfMethodCallIgnored
+            f.delete();
+        }
+    }
+
+    private String preloadResource(@NotNull String name) {
+        final File file = getResourceFile(name);
+
+        purgeResourceFiles(new File(CACHE_PATH), 0);
+        if (file.exists()) return file.getPath();
+
+        final InputStream stream = Manager.class.getResourceAsStream(name);
+        if (stream == null) return null;
+
+        final byte[] buffer;
+        final FileOutputStream writer;
+
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            file.getParentFile().mkdirs();
+        } catch (SecurityException e) {
+            try {stream.close();} catch (IOException ex) { /* Ignore */ }
+            return null;
+        }
+
+        try {
+            buffer = new byte[stream.available()];
+        } catch (IOException ex) {
+            try {stream.close();} catch (IOException e) { /* Ignore */ }
+            return null;
+        }
+
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            file.createNewFile();
+        } catch (IOException ex) {
+            try {stream.close();} catch (IOException e) { /* Ignore */ }
+            return null;
+        }
+
+        try {
+            writer = new FileOutputStream(file, false);
+        } catch (FileNotFoundException ex) {
+            try {stream.close();} catch (IOException e) { /* Ignore */ }
+            return null;
+        }
+
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            stream.read(buffer);
+            stream.close();
+        } catch (IOException ex) {
+            try {stream.close();} catch (IOException e) { /* Ignore */ }
+            try {writer.close();} catch (IOException e) { /* Ignore */ }
+            return null;
+        }
+
+        try {
+            writer.write(buffer);
+            writer.close();
+        } catch (IOException ex) {
+            try {writer.close();} catch (IOException e) { /* Ignore */ }
+            return null;
+        }
+
+        return file.getPath();
     }
 }
