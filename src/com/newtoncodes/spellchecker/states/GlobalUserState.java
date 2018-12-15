@@ -15,13 +15,11 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GlobalUserState extends CachedDictionaryState {
-    // private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.states.GlobalUserState");
-
     public static final String DICTIONARY_USER   = "cached";
     public static final String DICTIONARY_SHARED = "cachedShared";
 
-    private EventDispatcher<DictionaryStateListener> dispatcher;
-    private ExtendedDictionary collection;
+    private final EventDispatcher<DictionaryStateListener> dispatcher;
+    private final ExtendedDictionary collection;
 
     public GlobalUserState() {
         this(new UserDictionary(DEFAULT_NAME));

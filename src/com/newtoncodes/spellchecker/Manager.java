@@ -33,7 +33,7 @@ import static com.intellij.openapi.application.PathManager.getOptionsPath;
 import static com.intellij.project.ProjectKt.getProjectStoreDirectory;
 
 
-public class Manager extends SpellCheckerManager {
+class Manager extends SpellCheckerManager {
     private static final String CACHE_PATH = System.getProperty("idea.system.path", "") + File.separator + "spellchecker-extended";
 
     private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Manager");
@@ -47,8 +47,7 @@ public class Manager extends SpellCheckerManager {
     private Set<String> hunspell;
     private String version;
 
-    @SuppressWarnings("WeakerAccess")
-    public Manager(Project project, SpellCheckerSettings settings) {
+    private Manager(Project project, SpellCheckerSettings settings) {
         super(project, settings);
     }
 

@@ -1,7 +1,6 @@
 package com.newtoncodes.spellchecker.settings;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
@@ -12,17 +11,17 @@ import com.intellij.ui.components.JBCheckBox;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.newtoncodes.spellchecker.Provider;
+import com.newtoncodes.spellchecker.Hunspell;
 import com.newtoncodes.spellchecker.states.GlobalSettingsState;
 import com.newtoncodes.spellchecker.states.ProjectSettingsState;
 
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings("unused")
 public class Pane implements Disposable {
     private JPanel root;
     private JBCheckBox sharedGlobal;
@@ -30,7 +29,7 @@ public class Pane implements Disposable {
 
     private JPanel hunspellListPanel;
     private final OptionalChooserComponent<String> hunspellChooser;
-    private final List<Pair<String, Boolean>> bundledDictionaries = new ArrayList<>();
+    private final List<Pair<String, Boolean>> hunspellDictionaries = new ArrayList<>();
 
     private final GlobalSettingsState globalSettings;
     private final ProjectSettingsState projectSettings;
@@ -39,9 +38,9 @@ public class Pane implements Disposable {
         this.globalSettings = globalSettings;
         this.projectSettings = projectSettings;
 
-        fillBundledDictionaries();
+        setup();
 
-        hunspellChooser = new OptionalChooserComponent<String>(bundledDictionaries) {
+        hunspellChooser = new OptionalChooserComponent<String>(hunspellDictionaries) {
             @Override
             public JCheckBox createCheckBox(String path, boolean checked) {
                 return new JCheckBox(FileUtil.toSystemDependentName(path), checked);
@@ -52,7 +51,7 @@ public class Pane implements Disposable {
                 super.apply();
                 final HashSet<String> enabled = new HashSet<>();
 
-                for (Pair<String, Boolean> pair : bundledDictionaries) {
+                for (Pair<String, Boolean> pair : hunspellDictionaries) {
                     if (pair.second) enabled.add(pair.first);
                 }
 
@@ -62,13 +61,22 @@ public class Pane implements Disposable {
             @Override
             public void reset() {
                 super.reset();
-                fillBundledDictionaries();
+                setup();
             }
         };
 
         hunspellListPanel.setLayout(new BorderLayout());
         hunspellListPanel.add(hunspellChooser.getContentPane(), BorderLayout.CENTER);
         hunspellChooser.getEmptyText().setText(Bundle.message("no.dictionaries"));
+    }
+
+    private void setup() {
+        Set current = projectSettings.getHunspell();
+
+        hunspellDictionaries.clear();
+        for (String dictionary : Hunspell.getDictionaries()) {
+            hunspellDictionaries.add(Pair.create(dictionary, current.contains(dictionary)));
+        }
     }
 
     public JComponent getPane() {
@@ -83,8 +91,7 @@ public class Pane implements Disposable {
         );
     }
 
-    @SuppressWarnings("RedundantThrows")
-    public void apply() throws ConfigurationException {
+    public void apply() {
         if (globalSettings.isSharedGlobal() != sharedGlobal.isSelected()) {
             globalSettings.setSharedGlobal(sharedGlobal.isSelected());
         }
@@ -102,16 +109,6 @@ public class Pane implements Disposable {
         sharedGlobal.setSelected(globalSettings.isSharedGlobal());
         sharedProject.setSelected(projectSettings.isSharedProject());
         hunspellChooser.reset();
-    }
-
-    private void fillBundledDictionaries() {
-        bundledDictionaries.clear();
-
-        try {
-            for (String dictionary : Provider.getDictionaries()) {
-                bundledDictionaries.add(Pair.create(dictionary, projectSettings.getHunspell().contains(dictionary)));
-            }
-        } catch (IOException ignored) {}
     }
 
     @Override

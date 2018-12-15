@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
     name = "SharedProjectDictionaryState",
     storages = @Storage(value = "dictionary.xml")
 )
-public class ProjectSharedState extends DictionaryState implements PersistentStateComponent<DictionaryState> {
+class ProjectSharedState extends DictionaryState implements PersistentStateComponent<DictionaryState> {
     private final EventDispatcher<DictionaryStateListener> dispatcher = EventDispatcher.create(DictionaryStateListener.class);
 
     @SuppressWarnings("unused")

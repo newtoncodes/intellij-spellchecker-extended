@@ -16,13 +16,11 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ProjectUserState extends ProjectDictionaryState implements PersistentStateComponent<ProjectDictionaryState> {
-    // private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.states.ProjectUserState");
-
     public static final String DICTIONARY_USER   = "project";
     public static final String DICTIONARY_SHARED = "projectShared";
 
-    private EventDispatcher<DictionaryStateListener> dispatcher;
-    private ExtendedProjectDictionary collection;
+    private final EventDispatcher<DictionaryStateListener> dispatcher;
+    private final ExtendedProjectDictionary collection;
 
     public ProjectUserState() {
         super();

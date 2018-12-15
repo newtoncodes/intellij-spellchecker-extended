@@ -1,7 +1,6 @@
 package com.newtoncodes.spellchecker.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 
@@ -15,7 +14,7 @@ import javax.swing.*;
 
 
 @SuppressWarnings("CanBeFinal")
-public class Manager implements SearchableConfigurable, Configurable.NoScroll {
+class Manager implements SearchableConfigurable, Configurable.NoScroll {
     private Pane pane;
     private ProjectSettingsState settingsProject;
     private GlobalSettingsState settingsGlobal;
@@ -58,7 +57,7 @@ public class Manager implements SearchableConfigurable, Configurable.NoScroll {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         if (pane != null) pane.apply();
     }
 
