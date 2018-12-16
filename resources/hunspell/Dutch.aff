@@ -10,6 +10,7 @@
 # define char set
 SET UTF-8
 
+
 # statistical order as shown by Pander, except for the -, ‘’ and capitals
 TRY  -ernitsaoldgkupmchbvjwfzyx'’ëqïéèö.êü12635407çà8û9îñäôERNITSAOLDGKUPMCHBVJWFZYX
 

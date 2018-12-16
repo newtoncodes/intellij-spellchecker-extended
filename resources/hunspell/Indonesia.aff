@@ -35,6 +35,7 @@
 # Nota: untuk menambahkan lebih dari satu bentuk (nya, nyakah dst) mulai yang kedua tidak diberi titik (.)
 
 SET UTF-8
+
 TRY aeinrstkumlgopbdhjcyfwzqvxAEINRSTKUMLGOPBDHJCYFWZQVX
 WORDCHARS - 
 FLAG long

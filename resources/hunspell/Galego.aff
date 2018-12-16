@@ -48,6 +48,7 @@
 # Codificación de caracteres:
 SET UTF-8
 
+
 # Caracteres que se buscarán para facer suxestións de substitucións 
 # cando unicamente varíe un carácter na cadea
 TRY -aáàâãäeéêèiïìíîoóòôõöuùúûübcçdfghjklmnñpqrstvxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚÀÈÌÒÙÏÜÇ·

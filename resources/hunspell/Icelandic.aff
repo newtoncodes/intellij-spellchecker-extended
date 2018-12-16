@@ -1,5 +1,6 @@
 SET UTF-8
 
+
 #Letter frequency based on all Icelandic text from www.snerpa.is/net
 TRY arniesutðglmkofhvþádíójbúyöæépÞHSEGýBAVKNOFMJDLRÍÁTÓxIÉUzPÖcÚÆYÐCqXwÝQWZ
 WORDCHARS "-./=

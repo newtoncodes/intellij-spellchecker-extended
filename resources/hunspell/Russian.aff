@@ -1,4 +1,5 @@
 SET UTF-8
+
 FLAG num
 
 # This Russian dictionary is  packaged in .oxt and converted

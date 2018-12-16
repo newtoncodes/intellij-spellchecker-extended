@@ -11,6 +11,7 @@
 
 SET UTF-8
 
+
 WORDCHARS -’'1234567890.
 
 

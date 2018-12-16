@@ -23,6 +23,7 @@
 #You should have received a copy of the Mozilla Public License along with this library; if not, visit http://www.mozilla.org/MPL/MPL-1.1.html
 
 SET UTF-8
+
 TRY esrntliadkogmufbvphæøyjåcSMAKBHTLzRNEGéJVFDCwPIxOZ'.UWqØYÅüXQöèóáúðëÆíÖäÜÁàôïêÞÓÿîçãÒÍ.
 FLAG num
 KEY qwertyuiopå|asdfghjklæø|zxcvbnm
