@@ -135,11 +135,6 @@ public class Manager extends SpellCheckerManager {
         // Hex
         if (word.matches("^[a-fA-F0-9]+$")) return false;
 
-        // Password
-//        if (word.matches("^[a-fA-F0-9]+$")) return false;
-
-        // TODO hex and password
-        // TODO package description hex and password
         return super.hasProblem(word);
     }
 
@@ -202,7 +197,6 @@ public class Manager extends SpellCheckerManager {
 
                 getSpellChecker().addDictionary(dictionary);
 
-                System.out.println(dictionary.getName()); // TODO: remove
                 break;
             }
 
