@@ -6,4 +6,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'spellchecker-extended'
+rootProject.name = 'spellchecker'

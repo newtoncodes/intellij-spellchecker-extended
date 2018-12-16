@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.newtoncodes.spellchecker</id>
+    <id>spellchecker</id>
     <name>Spell checker extended</name>
     <version>0.1.0</version>
 

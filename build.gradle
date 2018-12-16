@@ -1,6 +1,7 @@
 plugins {
     id 'com.gradle.plugin-publish' version '0.10.0'
     id 'org.jetbrains.intellij' version '0.3.12'
+    id 'java-gradle-plugin'
     id 'idea'
     id 'maven'
 }
@@ -9,6 +10,7 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'java-gradle-plugin'
+
 repositories {
     mavenCentral()
     maven { url 'https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-plugin-service' }
@@ -26,9 +28,6 @@ dependencies {
     compile 'org.jetbrains.intellij.plugins:structure-base:3.45'
     compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
     compile 'de.undercouch:gradle-download-task:3.4.2'
-
-//    implementation fileTree(dir: 'lib', include: '*.jar')
-//    ideaPlugins fileTree(dir: 'lib', include: '*.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
@@ -65,13 +64,16 @@ pluginBundle {
     //noinspection GroovyAssignabilityCheck
     plugins {
         intellijPlugin {
-            id="com.newtoncodes.spellshecker"
+            id="com.newtoncodes.spellchecker"
             displayName="Spell checker extended"
         }
     }
 }
 
-apply from: 'publish.gradle'
+publishPlugin {
+    username intellijPublishUsername
+    password intellijPublishPassword
+}
 
 //
 
