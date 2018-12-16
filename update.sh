@@ -55,9 +55,6 @@ rm -rf resources/hunspell/*
 mv tmp/*.dic resources/hunspell/
 mv tmp/*.aff resources/hunspell/
 
-# TODO: sed unicode
-# TODO: portugal
-
 sed -i "s/^ *FLAG UTF-8//" resources/hunspell/*.aff
 sed -i "s/^ *SET UTF-8/SET UTF-8\nFLAG UTF-8/g" resources/hunspell/*.aff
 sed -i "s/^ *FLAG UTF-8/FLAG UTF-8\nLANG pt_BR/g" resources/hunspell/Portuguese__Brazilian.aff

@@ -34,6 +34,7 @@ import static com.intellij.openapi.application.PathManager.getOptionsPath;
 import static com.intellij.project.ProjectKt.getProjectStoreDirectory;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 public class Manager extends SpellCheckerManager {
     private static final String CACHE_PATH = System.getProperty("idea.system.path", "") + File.separator + "spellchecker-extended";
 
@@ -218,10 +219,7 @@ public class Manager extends SpellCheckerManager {
 //            name.contains("Ukrainian") ||
 //            name.contains("Vietnamese") ||
 
-            name.contains("Hungarian") ||
-
-            //
-            name.contains("Bulgarian")
+            false
         ) {
             System.err.println("Skipped resource: " + name);
             return;
