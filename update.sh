@@ -24,7 +24,7 @@ function get_name {
     x=${x/Serbian__Cyrillic/Serbian}
     x=${x/Serbian__Latin/Serbian_DELETE}
 
-    x=${x/Turkish/Hungarian_DELETE} # not working
+    x=${x/Hungarian/Hungarian_DELETE} # not working
     x=${x/Turkish/Turkish_DELETE} # not working
     x=${x/Basque/Basque_DELETE} # not working
 

@@ -21,7 +21,6 @@ public class Hunspell {
         "Galego",
         "German",
         "Greek",
-        "Hungarian",
         "Icelandic",
         "Indonesia",
         "Italian",
