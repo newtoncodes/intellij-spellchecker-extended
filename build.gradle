@@ -65,8 +65,8 @@ pluginBundle {
     //noinspection GroovyAssignabilityCheck
     plugins {
         intellijPlugin {
-            id = id
-            displayName = name
+            id="com.newtoncodes.spellshecker"
+            displayName="Spell checker extended"
         }
     }
 }
