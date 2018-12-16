@@ -2,21 +2,26 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.10.0'
     id 'org.jetbrains.intellij' version '0.3.12'
     id 'java-gradle-plugin'
-    id 'idea'
     id 'maven'
 }
 
-apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'idea'
-apply plugin: 'java'
+apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+plugins.withType(JavaPlugin) {
+    project.tasks.withType(GroovyCompile) { task ->
+        task.sourceCompatibility = project.sourceCompatibility
+        task.targetCompatibility = project.targetCompatibility
+    }
+}
+
 repositories {
-    mavenCentral()
     maven { url 'https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-plugin-service' }
     maven { url 'https://cache-redirector.jetbrains.com/repo1.maven.org/maven2' }
     maven { url 'https://cache-redirector.jetbrains.com/jcenter.bintray.com' }
-    maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+    // mavenCentral()
 }
 
 dependencies {
@@ -28,8 +33,6 @@ dependencies {
     compile 'org.jetbrains.intellij.plugins:structure-base:3.45'
     compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
     compile 'de.undercouch:gradle-download-task:3.4.2'
-
-    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 sourceSets {
@@ -44,16 +47,17 @@ sourceSets {
 }
 
 intellij {
-    sandboxDirectory = "$project.buildDir/sandbox"
+    pluginName 'spellchecker-extended'
     version '2018.3.1'
     plugins 'hunspell:183.3795.24'
+    sandboxDirectory = "$project.buildDir/sandbox"
 }
 
 //
 
-version = "$version"
-group = "$group"
-description = "$description"
+version = '0.1.0'
+group = 'com.newtoncodes'
+description = 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
 
 pluginBundle {
     website = 'https://github.com/newtoncodes/intellij-spellchecker-extended'
@@ -64,8 +68,8 @@ pluginBundle {
     //noinspection GroovyAssignabilityCheck
     plugins {
         intellijPlugin {
-            id="com.newtoncodes.spellchecker"
-            displayName="Spell checker extended"
+            id = 'com.newtoncodes.spellchecker'
+            displayName = 'Spell checker extended'
         }
     }
 }
@@ -74,6 +78,57 @@ publishPlugin {
     username intellijPublishUsername
     password intellijPublishPassword
 }
+
+//
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+//            }
+//
+//            pom.project {
+//                artifactId project.name
+//                name 'Gradle IntelliJ Plugin'
+//                description project.description
+//                version "$snapshotVersion-SNAPSHOT"
+//                url 'https://github.com/JetBrains/gradle-intellij-plugin'
+//                packaging 'jar'
+//
+//                scm {
+//                    connection 'scm:git:https://github.com/JetBrains/gradle-intellij-plugin/'
+//                    developerConnection 'scm:git:https://github.com/JetBrains/gradle-intellij-plugin/'
+//                    url 'https://github.com/JetBrains/gradle-intellij-plugin/'
+//                }
+//
+//                licenses {
+//                    license {
+//                        name 'The Apache License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//
+//                developers {
+//                    developer {
+//                        id 'zolotov'
+//                        name 'Alexander Zolotov'
+//                        email 'zolotov@jetbrains.com'
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 //
 
