@@ -1,7 +1,7 @@
 package com.newtoncodes.spellchecker;
 
 public class Hunspell {
-    private static String[] dictionaries = {
+    private static final String[] dictionaries = {
         "Armenian",
         "Austrian",
         "Belgian",

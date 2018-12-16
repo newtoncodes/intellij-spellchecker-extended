@@ -58,21 +58,23 @@ mv tmp/*.aff resources/hunspell/
 # TODO: sed unicode
 # TODO: portugal
 
-sed -i "s/SET UTF-8/SET UTF-8\nFLAG UTF-8/g" resources/hunspell/*.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Spanish.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Russian.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Persian.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Mongolian.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Korean.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Indonesia.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Icelandic.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Galego.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/French.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Danish.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Dutch.aff
-sed -i "s/^FLAG UTF-8//" resources/hunspell/Armenian.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/*.aff
+sed -i "s/^ *SET UTF-8/SET UTF-8\nFLAG UTF-8/g" resources/hunspell/*.aff
+sed -i "s/^ *FLAG UTF-8/FLAG UTF-8\nLANG pt_BR/g" resources/hunspell/Portuguese__Brazilian.aff
 
-echo "private static String[] dictionaries = {"
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Russian.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Persian.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Mongolian.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Korean.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Indonesia.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Icelandic.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Galego.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/French.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Danish.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Dutch.aff
+sed -i "s/^ *FLAG UTF-8//" resources/hunspell/Armenian.aff
+
+echo "private static final String[] dictionaries = {"
 
 cd resources/hunspell/ && for n in *.dic; do {
     x=$(printf '%s\n' "$n")
