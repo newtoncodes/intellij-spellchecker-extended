@@ -11,6 +11,6 @@
 
 .gradle
 
-/publish.properties
+/publish.gradle
 /build/
 /tmp/

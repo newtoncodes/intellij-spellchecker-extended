@@ -9,9 +9,6 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'java-gradle-plugin'
-
-apply from: "publish.properties"
-
 repositories {
     mavenCentral()
     maven { url 'https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-plugin-service' }
@@ -74,10 +71,7 @@ pluginBundle {
     }
 }
 
-publishPlugin {
-    username intellijPublishUsername
-    password intellijPublishPassword
-}
+apply from: 'publish.gradle'
 
 //
 
