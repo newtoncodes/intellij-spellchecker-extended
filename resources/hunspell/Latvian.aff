@@ -39,6 +39,7 @@
 # Faila formÄts: Hunspell
 
 SET UTF-8
+FLAG UTF-8
 TRY ianseÄtumpojÅ¡rkdÄ«zlÄvbgcÄ·Å«ÅÄ¼ÄÅ¾fÄ£hASMVLDIKERBGJZTNPHUOFCÄÄ¶Å½ÄÄ¢Å ÄªÅªÄÅÄ»
 KEY qwertyuiop|asdfghjkl|zxcvbnm|kÄ·|nÅ|cÄ
 FULLSTRIP

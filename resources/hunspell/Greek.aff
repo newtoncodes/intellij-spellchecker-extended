@@ -31,6 +31,7 @@
 #  Καρλόβασι, Σάμος ,24-9-97
 
 SET UTF-8
+FLAG UTF-8
 # You are likely to forget the accent, so accented characters come first. If
 # you don't forget the accent, this order won't do any harm because it is higly
 # unlikely for a word that differs in one accented char plus some other mistake

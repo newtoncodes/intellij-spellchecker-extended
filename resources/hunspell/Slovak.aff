@@ -1,5 +1,6 @@
 # verzia: 2.03-1, 2009-12-19
 SET UTF-8
+FLAG UTF-8
 TRY aoeintsvrlkmdpuhjzácbyčžíšýúťéľôďgfňäóŕxĺwěřqůAOEINTSVRLKMDPUHJZÁCBYČŽÍŠÝÚŤÉĽÔĎGFŇÄÓŔXĹWĚŘQŮ
 
 # replacenment table for

@@ -1,4 +1,5 @@
 SET UTF-8
+FLAG UTF-8
 TRY aeistlunkodmrvpgjhäõbüoöfcwzx¨q¸
 COMPOUNDFLAG Z
 COMPOUNDMIN 2

@@ -21,6 +21,7 @@
 #
 
 SET UTF-8
+FLAG UTF-8
 TRY aeiuonrtldspjgkmhbcyfvwzqxSNRTLCGDMPHBEAUYOFIVKWZQJX 
 
 PFX B Y 2 

@@ -12,9 +12,7 @@ import com.intellij.ui.components.JBCheckBox;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.newtoncodes.spellchecker.Hunspell;
 import com.newtoncodes.spellchecker.states.GlobalSettingsState;
@@ -49,7 +47,7 @@ public class Pane implements Disposable {
             @Override
             public void apply() {
                 super.apply();
-                final HashSet<String> enabled = new HashSet<>();
+                ArrayList<String> enabled = new ArrayList<>();
 
                 for (Pair<String, Boolean> pair : hunspellDictionaries) {
                     if (pair.second) enabled.add(pair.first);
@@ -71,7 +69,7 @@ public class Pane implements Disposable {
     }
 
     private void setup() {
-        Set current = projectSettings.getHunspell();
+        ArrayList current = projectSettings.getHunspell();
 
         hunspellDictionaries.clear();
         for (String dictionary : Hunspell.getDictionaries()) {
@@ -100,9 +98,9 @@ public class Pane implements Disposable {
             projectSettings.setSharedProject(sharedProject.isSelected());
         }
 
-        SpellCheckerManager.restartInspections();
-
         if (hunspellChooser.isModified()) hunspellChooser.apply();
+
+        SpellCheckerManager.restartInspections();
     }
 
     public void reset() {
@@ -111,6 +109,7 @@ public class Pane implements Disposable {
         hunspellChooser.reset();
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Override
     public void dispose() {}
 }

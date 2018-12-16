@@ -1,4 +1,6 @@
 SET UTF-8
+FLAG UTF-8
+LANG pt_BR
 TRY áàãâéêíóõôúüçesianrtolcdugmphbyfvkwjqxz
 
 #   Copyright (C) 2006 - 2010  por Raimundo Santos Moura

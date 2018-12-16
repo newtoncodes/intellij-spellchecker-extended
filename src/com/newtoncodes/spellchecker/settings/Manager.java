@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 
-@SuppressWarnings("CanBeFinal")
+@SuppressWarnings({"CanBeFinal", "unused"})
 class Manager implements SearchableConfigurable, Configurable.NoScroll {
     private Pane pane;
     private ProjectSettingsState settingsProject;
@@ -32,6 +32,7 @@ class Manager implements SearchableConfigurable, Configurable.NoScroll {
         return Bundle.message("spelling.extended");
     }
 
+    @SuppressWarnings("SameReturnValue")
     @Override
     @NotNull
     @NonNls

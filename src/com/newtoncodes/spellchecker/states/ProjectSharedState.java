@@ -12,6 +12,7 @@ import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 
 
+@SuppressWarnings("unused")
 @State(
     name = "SharedProjectDictionaryState",
     storages = @Storage(value = "dictionary.xml")

@@ -1,4 +1,5 @@
 SET UTF-8
+FLAG UTF-8
 
 # This is generated from
 # make words.nb; perl -ne 'print join "\n", split //' words.nb | \

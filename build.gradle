@@ -46,7 +46,7 @@ sourceSets {
 }
 
 intellij {
-    sandboxDirectory = "$project.buildDir/ide-sandbox"
+    sandboxDirectory = "$project.buildDir/sandbox"
     version '2018.3.1'
     plugins 'hunspell:183.3795.24'
 }

@@ -53,6 +53,7 @@
 #     Z Pronoms personals prefixats
 
 SET UTF-8
+FLAG UTF-8
 
 TRY easirtocnlumdpgvfbqjwxyzhàèéíïòóúüç·-'
 

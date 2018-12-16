@@ -34,6 +34,7 @@ LANG it_IT
 HOME http://linguistico.sourceforge.net/wiki
 VERSION 2.4 (01/09/2007)
 SET UTF-8
+FLAG UTF-8
 TRY aioertnsclmdpgubzfvhàq'ACMSkBGPLxEyRTVòIODNwFéùèìjUZKHWJYQXÙÀÒÈÌÉ
 #Nota: non presenti nel dizionario: ÙÀÒÈÌÉ, vanno aggiunte alla TRY rigenerata
 

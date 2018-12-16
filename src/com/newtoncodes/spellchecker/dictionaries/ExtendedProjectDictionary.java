@@ -53,6 +53,7 @@ public class ExtendedProjectDictionary extends ProjectDictionary {
         return key;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setActiveName(String name) {
         user.setActiveName(name);

@@ -1,4 +1,5 @@
 SET UTF-8
+FLAG UTF-8
 TRY aeiontrmjlsvpdkuzčšgbhcžfwyćx
 
 PFX B Y 1

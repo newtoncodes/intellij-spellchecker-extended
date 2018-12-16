@@ -2,12 +2,12 @@ package com.newtoncodes.spellchecker;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.*;
 import com.intellij.spellchecker.SpellCheckerManager;
 import com.intellij.spellchecker.dictionary.CustomDictionaryProvider;
@@ -25,6 +25,7 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ import static com.intellij.openapi.application.PathManager.getOptionsPath;
 import static com.intellij.project.ProjectKt.getProjectStoreDirectory;
 
 
-class Manager extends SpellCheckerManager {
+public class Manager extends SpellCheckerManager {
     private static final String CACHE_PATH = System.getProperty("idea.system.path", "") + File.separator + "spellchecker-extended";
 
     private static final Logger LOG = Logger.getInstance("#com.newtoncodes.spellchecker.Manager");
@@ -47,7 +48,7 @@ class Manager extends SpellCheckerManager {
     private Set<String> hunspell;
     private String version;
 
-    private Manager(Project project, SpellCheckerSettings settings) {
+    public Manager(Project project, SpellCheckerSettings settings) {
         super(project, settings);
     }
 
@@ -60,7 +61,7 @@ class Manager extends SpellCheckerManager {
 
         projectState.setShared(projectSettings.isSharedProject());
 
-        final Set<String> enabled = projectSettings.getHunspell();
+        final List<String> enabled = projectSettings.getHunspell();
         final Set<String> removed = new THashSet<>();
 
         boolean changed = false;
@@ -73,6 +74,8 @@ class Manager extends SpellCheckerManager {
             changed = true;
             unloadHunspell(name);
         }
+
+        enabled.sort(String::compareToIgnoreCase);
 
         for (String name : enabled) {
             if (!hunspell.contains(name)) {
@@ -109,19 +112,26 @@ class Manager extends SpellCheckerManager {
             projectState.setShared(projectSettings.isSharedProject());
         }
 
-        final Set<String> enabled = projectSettings.getHunspell();
+        ArrayList<String> enabled = projectSettings.getHunspell();
+        enabled.sort(String::compareToIgnoreCase);
 
         hunspell.clear();
+        purgeResourceFiles(new File(CACHE_PATH), 0);
 
-        if (enabled != null && !enabled.isEmpty()) for (String name : enabled) {
+        if (!enabled.isEmpty()) for (String name : enabled) {
             loadHunspell(name);
         }
     }
 
     @Override
     public boolean hasProblem(@NotNull String word) {
+        if (word.length() <= 3) return super.hasProblem(word);
+
         if (word.matches("^[a-fA-F0-9]+$")) return false;
-        LOG.warn("[HUNSPELL] WORD: " + word);
+
+        // TODO hex and password
+        // TODO package description hex and password
+//        LOG.warn("[HUNSPELL] WORD: " + word);
         return super.hasProblem(word);
     }
 
@@ -158,20 +168,346 @@ class Manager extends SpellCheckerManager {
         return super.getAppDictionaryPath();
     }
 
+
+    private ArrayList<String> queue;
+    private boolean queueRunning = false;
+
     private void loadHunspell(@NotNull String name) {
+        if (
+//            name.contains("Armenian") ||
+//            name.contains("Austrian") ||
+//            name.contains("Belgian") ||
+//            name.contains("Catalan") ||
+//            name.contains("Croatian") ||
+//            name.contains("Czech") ||
+//            name.contains("Danish") ||
+//            name.contains("Dutch") ||
+//            name.contains("English - American") ||
+//            name.contains("English - Australian") ||
+//            name.contains("English - British") ||
+//            name.contains("English - Canadian") ||
+//            name.contains("English - South African") ||
+//            name.contains("Estonian") ||
+//            name.contains("French") ||
+//            name.contains("Galego") ||
+//            name.contains("German") ||
+//            name.contains("Greek") ||
+//            name.contains("Icelandic") ||
+//            name.contains("Indonesia") ||
+//            name.contains("Italian") ||
+//            name.contains("Korean") ||
+//            name.contains("Latvian") ||
+//            name.contains("Lithuanian") ||
+//            name.contains("Luxembourgish") ||
+//            name.contains("Malays") ||
+//            name.contains("Mongolian") ||
+//            name.contains("Norwegian - Bokmal") ||
+//            name.contains("Norwegian - Nynorsk") ||
+//            name.contains("Persian") ||
+//            name.contains("Polish") ||
+//            name.contains("Portuguese - Brazilian") ||
+//            name.contains("Portuguese - European") ||
+//            name.contains("Romanian") ||
+//            name.contains("Russian") ||
+//            name.contains("Serbian") ||
+//            name.contains("Slovak") ||
+//            name.contains("Slovenian") ||
+//            name.contains("Spanish") ||
+//            name.contains("Swedish") ||
+//            name.contains("Swiss") ||
+//            name.contains("Ukrainian") ||
+//            name.contains("Vietnamese") ||
+
+            name.contains("Hungarian") ||
+
+            //
+            name.contains("Bulgarian")
+        ) {
+            System.err.println("Skipped resource: " + name);
+            return;
+        }
+
+        if (queue == null) queue = new ArrayList<>();
+        queue.add(name);
+
+        runDictionary();
+    }
+
+    private void runDictionary() {
+        if (queueRunning || queue.size() == 0) return;
+        queueRunning = true;
+
+        String name = queue.remove(0);
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (!loadHunspell(name, true)) {
+                queueRunning = false;
+                runDictionary();
+                return;
+            }
+
+            restartInspections();
+
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                try {
+                    Thread.sleep(10);
+
+                    while (!getSpellChecker().isDictionaryLoad(getResourceFile(getResourceName(name, "dic")).getPath())) {
+                        Thread.sleep(10);
+                    }
+                } catch (Exception e) { /* Ignore */ }
+
+
+                try { Thread.sleep(10); } catch (Exception e) { /* Ignore */ }
+                restartInspections();
+
+                for (String w : words) {
+                    getSpellChecker().isCorrect(w);
+                    getSpellChecker().getVariants(w);
+                }
+
+                // unloadHunspell(name);
+
+                queueRunning = false;
+                runDictionary();
+            });
+        });
+    }
+
+    private static final String[] words = {
+        "ֆրթացնել",
+        "ֆրիզ",
+        "zytoplasmatisch",
+        "zzgl.",
+        "zuzki",
+        "шкалаў",
+        "шрубарэзаў",
+        "штыкецінаў",
+        "шчарбінаў",
+        "шчыкецінаў",
+        "шыбеніцаў",
+        "шыбінаў",
+        "электралячэбніцаў",
+        "электратурбінаў",
+        "ягадзіцаў",
+        "zúdnic",
+        "Zululàndia",
+        "ZUR",
+        "Zuric",
+        "žutjelo",
+        "žutozelenu",
+        "žvaču",
+        "žvakaćih",
+        "žvakaćima",
+        "žvakaćoj",
+        "žvakaću",
+        "žvakali",
+        "žvali",
+        "žvrgolje",
+        "åsyn",
+        "åsynets",
+        "Ĳslands",
+        "Ĳslandrug",
+        "déjàvu",
+        "tengevolge",
+        "Hitlergroet",
+        "zoophyte",
+        "zoophytic",
+        "zounds",
+        "zygotic",
+        "zest",
+        "zilch",
+        "ZX",
+        "zygote",
+        "Ågar",
+        "Århus",
+        "à",
+        "zoophyte",
+        "zoophytic",
+        "zounds",
+        "zygotic",
+        "yucky",
+        "zero-sum",
+        "zilch",
+        "à",
+        "ρ7",
+        "σ7",
+        "τ7",
+        "υ7",
+        "φ7",
+        "χ7",
+        "ψ7",
+        "ω7",
+        "ℓ",
+        "sr",
+        "zytoplasmatisch",
+        "zzgl.",
+        "υπερκινητικότητα",
+        "υποπτεύθηκα",
+        "υποφέρατε",
+        "υποφέρεις",
+        "υφαλμύρωση",
+        "φανταράκια",
+        "φοροκλέβουν",
+        "φτωχύνεις",
+        "χηρέψετε",
+        "ψιλοάχρηστο",
+        "950",
+        "þýðirst:þýða",
+        "þýðis",
+        "þýðisins",
+        "þýðist",
+        "þýðiðst:þýða",
+        "þýðlega",
+        "þýðsku",
+        "þýðu",
+        "þýðumst:þýða",
+        "þýður",
+        "zuama",
+        "zuhud",
+        "zuhur",
+        "zulfikar",
+        "Zulhijah",
+        "Zulkaidah",
+        "zulmat",
+        "zulu",
+        "zuriah",
+        "zus",
+        "Zuglio",
+        "zulu",
+        "Zumaglia",
+        "zumando",
+        "Zungoli",
+        "Zurigo",
+        "ㅚ",
+        "žūžas",
+        "Zviniškiai",
+        "ësst",
+        "ëstlech",
+        "üüblech",
+        "üübs",
+        "üübt",
+        "zoologi",
+        "Zuhal",
+        "Zuhrah",
+        "zuhud",
+        "Zuhur",
+        "Zulhijah",
+        "Zulkaedah",
+        "zulmat",
+        "ятуу",
+        "øystatene",
+        "øystater/",
+        "øystre/",
+        "øyturene/",
+        "øyturer/",
+        "øyværingene/",
+        "øyriki",
+        "øyrut",
+        "øystri",
+        "øystrone",
+        "øystror",
+        "یگانه‌سالار",
+        "یگانه‌سالاری",
+        "یگانه‌پرست",
+        "یگانه‌پرستی",
+        "یگانگی",
+        "ییلاقات",
+        "ییلاق‌نشین",
+        "ósmak",
+        "ów",
+        "ówdzie",
+        "ówże",
+        "óśmi",
+        "zurvanada",
+        "zuzins",
+        "µg",
+        "µmol",
+        "µUI",
+        "equivalhas",
+        "ncântare",
+        "nțelegem",
+        "nvață",
+        "napoi",
+        "nchide",
+        "ntinde",
+        "ntorc",
+        "gudurându",
+        "venindu",
+        "nvață",
+        "шчепају",
+        "шчепала",
+        "шчепале",
+        "шчепали",
+        "шчепам",
+        "шчепао",
+        "шчепате",
+        "шчепати",
+        "шчепаш",
+        "шчи",
+        "ščepaju",
+        "ščepala",
+        "ščepale",
+        "ščepali",
+        "ščepam",
+        "ščepao",
+        "ščepate",
+        "ščepati",
+        "ščepaš",
+        "šči",
+        "žúžoľmi",
+        "žúžoľoch",
+        "žúžoľom",
+        "žúžoľov",
+        "žúžoľový",
+        "žúžoľu",
+        "žužu",
+        "žvacheľ",
+        "žžonka",
+        "Ivic",
+        "sneg",
+        "zurrir",
+        "zuzar",
+        "överösning",
+        "övrigas",
+        "Özz",
+        "zytoplasmatisch",
+        "zzgl.",
+        "zürafagiller",
+        "zürafalan",
+        "zürafalı",
+        "zürafalığını",
+        "zürefalı",
+        "zürriyetsiz",
+        "züyuf",
+        "ящерові",
+        "ящером",
+        "ящеру",
+        "ящиковий",
+        "ящір",
+        "ứ",
+        "ứa",
+        "ức",
+        "ứng",
+        "ừ",
+        "ừng",
+        "ửng",
+        "ựa",
+        "ực",
+        "ỷ"
+    };
+
+    @SuppressWarnings("unused")
+    private boolean loadHunspell(@NotNull String name, @SuppressWarnings("SameParameterValue") boolean second) { // TODO: remove second
+        System.err.println("Loading: " + name); // TODO: remove
+
         hunspell.add(name);
 
-        final String dic = preloadResource(name);
-        if (dic == null) {
-            LOG.warn("[HUNSPELL] Dic file not found: " + name);
-            return;
-        }
+        final String dic = preloadResource(name, "dic");
+        if (dic == null) return false;
 
-        final String aff = preloadResource(FileUtilRt.getNameWithoutExtension(name) + "." + "aff");
-        if (aff == null) {
-            LOG.warn("[HUNSPELL] Aff file not found: " + name);
-            return;
-        }
+        final String aff = preloadResource(name, "aff");
+        if (aff == null) return false;
 
         for (CustomDictionaryProvider provider : CustomDictionaryProvider.EP_NAME.getExtensionList()) {
             if (!provider.toString().startsWith("com.intellij.hunspell.HunspellDictionaryProvider")) continue;
@@ -180,17 +516,94 @@ class Manager extends SpellCheckerManager {
             if (dictionary == null) continue;
 
             getSpellChecker().addDictionary(dictionary);
-            return;
+
+            return true;
         }
+
+        return true;
     }
 
     private void unloadHunspell(@NotNull String name) {
+        String path = getResourceFile(getResourceName(name, "dic")).getPath();
+        System.err.println("Unloading: " + (getSpellChecker().isDictionaryLoad(path) ? "YES" : "NO") + " | " + path); // TODO: remove
+
         hunspell.remove(name);
-        getSpellChecker().removeDictionary(getResourceFile(name).getPath());
+
+        getSpellChecker().removeDictionary(getResourceFile(getResourceName(name, "dic")).getPath());
+    }
+
+    private String getResourceName(@NotNull String name, @NotNull String ext) {
+        return "/hunspell/" + name.replaceAll(" ", "_").replaceAll("-", "") + "." + ext;
     }
 
     private File getResourceFile(@NotNull String name) {
         return new File(CACHE_PATH + File.separator + version + File.separator + name);
+    }
+
+    private String preloadResource(@NotNull String name, @NotNull String ext) {
+        final File file = getResourceFile(getResourceName(name, ext));
+        if (file.exists()) return file.getPath();
+
+        try {
+            final InputStream stream = Manager.class.getResourceAsStream(getResourceName(name, ext));
+            if (stream == null) throw new Exception();
+
+            final byte[] buffer;
+            final FileOutputStream writer;
+
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.getParentFile().mkdirs();
+            } catch (SecurityException e) {
+                try {stream.close();} catch (IOException ex) { /* Ignore */ }
+                throw new Exception();
+            }
+
+            try {
+                buffer = new byte[stream.available()];
+            } catch (IOException ex) {
+                try {stream.close();} catch (IOException e) { /* Ignore */ }
+                throw new Exception();
+            }
+
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.createNewFile();
+            } catch (IOException ex) {
+                try {stream.close();} catch (IOException e) { /* Ignore */ }
+                throw new Exception();
+            }
+
+            try {
+                writer = new FileOutputStream(file, false);
+            } catch (FileNotFoundException ex) {
+                try {stream.close();} catch (IOException e) { /* Ignore */ }
+                throw new Exception();
+            }
+
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                stream.read(buffer);
+                stream.close();
+            } catch (IOException ex) {
+                try {stream.close();} catch (IOException e) { /* Ignore */ }
+                try {writer.close();} catch (IOException e) { /* Ignore */ }
+                throw new Exception();
+            }
+
+            try {
+                writer.write(buffer);
+                writer.close();
+            } catch (IOException ex) {
+                try {writer.close();} catch (IOException e) { /* Ignore */ }
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            LOG.warn("[HUNSPELL] Resource not found: " + name + " [" + ext + "] -> " + file.getPath());
+            return null;
+        }
+
+        return file.getPath();
     }
 
     private void purgeResourceFiles(@NotNull File dir, int level) {
@@ -205,68 +618,5 @@ class Manager extends SpellCheckerManager {
             //noinspection ResultOfMethodCallIgnored
             f.delete();
         }
-    }
-
-    private String preloadResource(@NotNull String name) {
-        final File file = getResourceFile(name);
-
-        purgeResourceFiles(new File(CACHE_PATH), 0);
-        if (file.exists()) return file.getPath();
-
-        final InputStream stream = Manager.class.getResourceAsStream(name);
-        if (stream == null) return null;
-
-        final byte[] buffer;
-        final FileOutputStream writer;
-
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            file.getParentFile().mkdirs();
-        } catch (SecurityException e) {
-            try {stream.close();} catch (IOException ex) { /* Ignore */ }
-            return null;
-        }
-
-        try {
-            buffer = new byte[stream.available()];
-        } catch (IOException ex) {
-            try {stream.close();} catch (IOException e) { /* Ignore */ }
-            return null;
-        }
-
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            file.createNewFile();
-        } catch (IOException ex) {
-            try {stream.close();} catch (IOException e) { /* Ignore */ }
-            return null;
-        }
-
-        try {
-            writer = new FileOutputStream(file, false);
-        } catch (FileNotFoundException ex) {
-            try {stream.close();} catch (IOException e) { /* Ignore */ }
-            return null;
-        }
-
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            stream.read(buffer);
-            stream.close();
-        } catch (IOException ex) {
-            try {stream.close();} catch (IOException e) { /* Ignore */ }
-            try {writer.close();} catch (IOException e) { /* Ignore */ }
-            return null;
-        }
-
-        try {
-            writer.write(buffer);
-            writer.close();
-        } catch (IOException ex) {
-            try {writer.close();} catch (IOException e) { /* Ignore */ }
-            return null;
-        }
-
-        return file.getPath();
     }
 }

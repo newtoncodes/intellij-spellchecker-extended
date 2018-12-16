@@ -10,10 +10,7 @@ import com.intellij.util.EventDispatcher;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EventListener;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import static com.intellij.openapi.util.text.StringUtil.notNullize;
 import static com.intellij.openapi.util.text.StringUtil.parseInt;
@@ -33,7 +30,7 @@ public class ProjectSettingsState implements PersistentStateComponent<Element> {
 
     private boolean sharedProject = false;
     private boolean sharedGlobal = false;
-    private Set<String> hunspell = new HashSet<>();
+    private ArrayList<String> hunspell = new ArrayList<>();
 
     public interface SettingsStateListener extends EventListener {
         void changed();
@@ -65,18 +62,24 @@ public class ProjectSettingsState implements PersistentStateComponent<Element> {
         return sharedProject;
     }
 
-    public void setHunspell(Set<String> value) {
+    public void setHunspell(ArrayList<String> value) {
+        if (hunspell == null) hunspell = new ArrayList<>();
+
         if (hunspell == value || hunspell.equals(value)) return;
         hunspell = value;
         dispatcher.getMulticaster().changed();
     }
 
-    public Set<String> getHunspell() {
+    public ArrayList<String> getHunspell() {
+        if (hunspell == null) hunspell = new ArrayList<>();
+
         return hunspell;
     }
 
     @Override
     public void loadState(@NotNull final Element element) {
+        if (hunspell == null) hunspell = new ArrayList<>();
+
         hunspell.clear();
 
         try {

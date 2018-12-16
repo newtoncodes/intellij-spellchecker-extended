@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 
-@SuppressWarnings("CanBeFinal")
+@SuppressWarnings({"CanBeFinal", "unused"})
 public class ExtendedDictionary implements EditableDictionary {
     private final Map<String, EditableDictionary> map = new HashMap<>();
     private EditableDictionary active;
@@ -139,6 +139,7 @@ public class ExtendedDictionary implements EditableDictionary {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     @Override
     public boolean isEmpty() {
         return false;

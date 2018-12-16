@@ -11,6 +11,7 @@
 # versions using the GPL may only include the GPL
 
 SET UTF-8
+FLAG UTF-8
 TRY esijanrtolcdugmphbyfvkwqxzäüößáéêàâñESIJANRTOLCDUGMPHBYFVKWQXZÄÜÖÉ-.
 
 PFX U Y 1
