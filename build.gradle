@@ -10,7 +10,7 @@ apply plugin: 'java-gradle-plugin'
 
 //
 
-version = '0.2.0'
+version = '0.2.1'
 group = 'com.newtoncodes'
 description = 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
 
@@ -38,11 +38,11 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
 
-    compile 'org.jetbrains:annotations:13.0'
-    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.30'
-    compile 'org.jetbrains.intellij.plugins:structure-base:3.45'
-    compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
-    compile 'de.undercouch:gradle-download-task:3.4.2'
+//    compile 'org.jetbrains:annotations:13.0'
+//    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.30'
+//    compile 'org.jetbrains.intellij.plugins:structure-base:3.45'
+//    compile 'org.jetbrains.intellij.plugins:structure-intellij:3.45'
+//    compile 'de.undercouch:gradle-download-task:3.4.2'
 }
 
 sourceSets {
