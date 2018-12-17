@@ -1,5 +1,3 @@
-ideaVersion = IDEA_VERSION
-pluginVersion = PLUGIN_VERSION
 
 intellijPublishUsername = USERNAME
 intellijPublishPassword = PASSWORD

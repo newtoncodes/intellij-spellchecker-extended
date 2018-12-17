@@ -10,9 +10,9 @@ apply plugin: 'java-gradle-plugin'
 
 //
 
-version pluginVersion
-group 'com.newtoncodes'
-description 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
+version = '0.2.0'
+group = 'com.newtoncodes'
+description = 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
 
 //
 
@@ -57,9 +57,9 @@ sourceSets {
 }
 
 intellij {
-    version ideaVersion
-    // updateSinceUntilBuild = false
+    version = '2018.3'
     downloadSources = true
+    // updateSinceUntilBuild = false
 
     pluginName 'spellchecker-extended'
     plugins 'hunspell:183.3795.24'
@@ -67,7 +67,7 @@ intellij {
 }
 
 patchPluginXml {
-    version pluginVersion
+    version = "$version"
     // pluginDescription description
     // changeNotes changelog
 }
