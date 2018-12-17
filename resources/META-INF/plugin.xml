@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.newtoncodes.spellchecker</id>
     <name>Spell checker extended</name>
-    <version>0.1.0</version>
+    <version>LATEST</version>
 
     <vendor email="dev@newton.codes" url="https://github.com/newtoncodes">Christian Nikolov</vendor>
     <description><![CDATA[

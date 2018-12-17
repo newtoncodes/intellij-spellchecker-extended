@@ -8,8 +8,17 @@ plugins {
 apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 
+//
+
+version pluginVersion
+group 'com.newtoncodes'
+description 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
+
+//
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
 plugins.withType(JavaPlugin) {
     project.tasks.withType(GroovyCompile) { task ->
         task.sourceCompatibility = project.sourceCompatibility
@@ -17,11 +26,12 @@ plugins.withType(JavaPlugin) {
     }
 }
 
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
 repositories {
     maven { url 'https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-plugin-service' }
     maven { url 'https://cache-redirector.jetbrains.com/repo1.maven.org/maven2' }
     maven { url 'https://cache-redirector.jetbrains.com/jcenter.bintray.com' }
-    // mavenCentral()
 }
 
 dependencies {
@@ -47,23 +57,26 @@ sourceSets {
 }
 
 intellij {
+    version ideaVersion
+    // updateSinceUntilBuild = false
+    downloadSources = true
+
     pluginName 'spellchecker-extended'
-    version '2018.3.1'
     plugins 'hunspell:183.3795.24'
     sandboxDirectory = "$project.buildDir/sandbox"
 }
 
-//
-
-version = '0.1.0'
-group = 'com.newtoncodes'
-description = 'Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.'
+patchPluginXml {
+    version pluginVersion
+    // pluginDescription description
+    // changeNotes changelog
+}
 
 pluginBundle {
     website = 'https://github.com/newtoncodes/intellij-spellchecker-extended'
     vcsUrl = 'https://github.com/newtoncodes/intellij-spellchecker-extended'
-    description = "$description"
     tags = ['spellchecker', 'dictionaries', 'dictionary', 'sync', 'share']
+    description description
 
     //noinspection GroovyAssignabilityCheck
     plugins {
@@ -79,8 +92,6 @@ publishPlugin {
     password intellijPublishPassword
 }
 
-//
-
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -89,48 +100,6 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives sourcesJar
 }
-
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-//                authentication(userName: ossrhUsername, password: ossrhPassword)
-//            }
-//
-//            pom.project {
-//                artifactId project.name
-//                name 'Gradle IntelliJ Plugin'
-//                description project.description
-//                version "$snapshotVersion-SNAPSHOT"
-//                url 'https://github.com/JetBrains/gradle-intellij-plugin'
-//                packaging 'jar'
-//
-//                scm {
-//                    connection 'scm:git:https://github.com/JetBrains/gradle-intellij-plugin/'
-//                    developerConnection 'scm:git:https://github.com/JetBrains/gradle-intellij-plugin/'
-//                    url 'https://github.com/JetBrains/gradle-intellij-plugin/'
-//                }
-//
-//                licenses {
-//                    license {
-//                        name 'The Apache License, Version 2.0'
-//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                    }
-//                }
-//
-//                developers {
-//                    developer {
-//                        id 'zolotov'
-//                        name 'Alexander Zolotov'
-//                        email 'zolotov@jetbrains.com'
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
-//
 
 wrapper {
     gradleVersion = '4.10'

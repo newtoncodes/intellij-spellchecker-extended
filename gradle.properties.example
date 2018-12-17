@@ -1,11 +1,5 @@
-group=com.newtoncodes
-id=com.newtoncodes.spellchecker
-version=0.1.0
+ideaVersion = IDEA_VERSION
+pluginVersion = PLUGIN_VERSION
 
-name=Spell checker extended
-description=Shareable spell checker dictionaries for IntelliJ with Additional bundled hunspell dictionaries.
-
-pluginsRepo=https://cache-redirector.jetbrains.com/plugins.jetbrains.com/maven
-
-intellijPublishUsername=""
-intellijPublishPassword=""
+intellijPublishUsername = USERNAME
+intellijPublishPassword = PASSWORD
