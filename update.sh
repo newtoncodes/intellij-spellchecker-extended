@@ -7,7 +7,6 @@ function get_name {
     x=${x// (/__}
     x=${x// /_}
 
-    x=${x/be-official/Belgian}
     x=${x/German_de_DE/German}
     x=${x/German_de_AT/Austrian}
     x=${x/German_de_CH/Swiss}
@@ -24,6 +23,7 @@ function get_name {
     x=${x/Serbian__Cyrillic/Serbian}
     x=${x/Serbian__Latin/Serbian_DELETE}
 
+    x=${x/be-official/Be_DELETE} # too big
     x=${x/Hungarian/Hungarian_DELETE} # not working
     x=${x/Turkish/Turkish_DELETE} # not working
     x=${x/Basque/Basque_DELETE} # not working
